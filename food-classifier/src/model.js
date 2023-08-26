@@ -1,13 +1,20 @@
 import * as tf from '@tensorflow/tfjs';
-import { Component } from 'react';
+import { Component, useState } from 'react';
 
-class Model extends Component {
+function Model() {
 
-    async loadModel() {
+    const [file, setFile] = useState();
+
+    function handleChange(e) {
+        console.log(e.target.files);
+        setFile(URL.createObjectURL(e.target.files[0]));
+    }
+
+    async function loadModel() {
         this.model = await tf.loadGraphModel("https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v2_130_224/classification/2/default/1", { fromTFHub: true });
     }
 
-    async predict(ImageData) {
+    async function predict(ImageData) {
         const pred = await tf.tidy(() => {
             let img = tf.FromPixels(ImageData, 1);
             img = img.reshape([1, 28, 28, 1]);
@@ -16,11 +23,16 @@ class Model extends Component {
 
             this.predictions = Array.from(output.dataSync());
         });
+        console.log(this.predictions)
     }
 
-    render() {
-        <H1>Hello</H1>
-    }
+    return(
+        <div>
+            <h1>Hello</h1>
+            <input type='file' onChange={handleChange}/>
+            <img src={file} style={{width: '500px', height: '500px'}}/>
+        </div>  
+    );
 }
 
 export default Model
